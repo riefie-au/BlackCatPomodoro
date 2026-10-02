@@ -14,15 +14,38 @@ function App() {
   "Let everything happen to you: beauty and terror. Just keep going. No feeling is final. - Rainer Maria Rilke",
   "Fear not, for I am with you; be not dismayed, for I am your God - Isaiah 41:10",
   "It is the Lord who goes before you. He will be with you; he will never leave you or forsake you. - Deuteronomy 31:8",
-  ];
-
-  const breakMessages = [
-  "Don't feel guilty for taking the breaks you need!",
   "Keep on going!",
   "You're doing great!",
   "I believe in you!",
   ];
 
+  const breakMessages = [
+  "Good Job! Consistency is key ~",
+  "Don't forget to drink water",
+  "Take a deep breath",
+  "Don't forget to stretch!",
+  ];
+
+//Encouragement message updater
+useEffect(() => {
+  let messageInterval: NodeJS.Timeout;
+
+  if (isRunning) {
+    const messages = isBreak ? breakMessages : quoteMessages;
+    setEncouragement(messages[0]);
+    let index = 1
+
+    messageInterval = setInterval(() => {
+      setEncouragement(messages[index]);
+      index = (index + 1) % messages.length;
+    }, 4000)
+  } else {
+    setEncouragement("");
+  }
+
+  return () => clearInterval(messageInterval);
+}, [isRunning, isBreak]);
+//countdown timer
   useEffect( () => {
     let timer: NodeJS.Timeout; //learn what this does later
     if (isRunning && timeLeft > 0) {
@@ -73,8 +96,8 @@ function App() {
           </button>
         </div>
 
-        <p>
-          I believe in you!
+        <p className={`encouragemet-text ${!isRunning ? "hidden" : ""}`}>
+          { encouragement }
         </p>
 
         <h1 className="home-timer">{formatTime(timeLeft)}</h1>
