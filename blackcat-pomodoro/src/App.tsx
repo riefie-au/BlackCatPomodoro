@@ -4,10 +4,13 @@ import './App.css';
 
 function App() {
   
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
+  const [timeLeft, setTimeLeft] = useState(1);
   const [isRunning, setIsRunning] = useState(false);
   const [isBreak, setIsBreak] = useState(false);
   const [encouragement, setEncouragement] = useState("");
+  const [workMinutes, setWorkMinutes] = useState(25);
+  const [breakMinutes, setBreakMinutes] = useState(5);
+  
 
   const quoteMessages = [
   "Tomorrow will worry about itself - Matthew 6:34",
@@ -67,14 +70,14 @@ useEffect(() => {
   const switchMode = (breakMode: boolean) => {
     setIsBreak(breakMode);
     setIsRunning(false);
-    setTimeLeft(breakMode ? 5 * 60 : 25 * 60);
+    setTimeLeft(breakMode ? 1 * 60 : 1 * 60);
   }
   const handleClick = () => {
     if (!isRunning) {
       setIsRunning(true);
     } else {
       setIsRunning(false);
-      setTimeLeft(isBreak ?5* 60 : 25 * 60);
+      setTimeLeft(isBreak ? 25 * 60 : 5 * 60);
     }
   }
 
