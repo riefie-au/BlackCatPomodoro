@@ -14,7 +14,7 @@ body {
 .home-container {
   width: 400px;
   height: 400px;
-  background-image: url('./assets/background-blue.png');
+  background-image: url('./assets/background.png');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -50,9 +50,6 @@ body {
   opacity: 0;
 }
 
-.background-green {
-  background-image: url('./assets/background-green.png');
-}
 
 .home-controls {
   display: flex;

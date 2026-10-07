@@ -72,12 +72,42 @@ useEffect(() => {
     setIsRunning(false);
     setTimeLeft(breakMode ? 1 * 60 : 1 * 60);
   }
+
+  const increaseTime = () => {
+    if (isBreak) {
+      const newMinutes = breakMinutes + 5;
+      setBreakMinutes(newMinutes);
+      setTimeLeft(newMinutes * 60);
+    }
+    else {
+      const newMinutes = workMinutes + 5;
+      setWorkMinutes(newMinutes);
+      setTimeLeft(newMinutes * 60);
+    }
+  }
+
+  const decreaseTime = () => {
+    if (breakMinutes < 5 || workMinutes < 5) {
+      return
+    }
+    if (isBreak) {
+      const newMinutes = breakMinutes - 5;
+      setBreakMinutes(newMinutes);
+      setTimeLeft(newMinutes * 60);
+    }
+    else {
+      const newMinutes = workMinutes - 5;
+      setWorkMinutes(newMinutes);
+      setTimeLeft(newMinutes * 60);
+    }
+
+  }
   const handleClick = () => {
     if (!isRunning) {
       setIsRunning(true);
     } else {
       setIsRunning(false);
-      setTimeLeft(isBreak ? 25 * 60 : 5 * 60);
+      setTimeLeft(isBreak ? 1 * 60 : 1 * 60);
     }
   }
 
@@ -103,7 +133,13 @@ useEffect(() => {
           { encouragement }
         </p>
 
-        <h1 className="home-timer">{formatTime(timeLeft)}</h1>
+        <div className="timer-row">
+          <button onClick={decreaseTime}>-</button>
+           <h1 className="home-timer">{formatTime(timeLeft)}</h1>
+          <button onClick={increaseTime}>+</button>
+        </div>
+
+  
 
         <button className="home-button" onClick={handleClick}>
           Start
