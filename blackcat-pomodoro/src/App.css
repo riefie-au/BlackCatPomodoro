@@ -1,10 +1,10 @@
-@font-face {
+/*@font-face {
   font-family: 'Retrograde-Regular';
   src: url('./assets/Retrograde-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
-
+*/
 body {
   font-family: 'Retrograde-Regular', sans-serif;
   margin: 0;
@@ -14,7 +14,7 @@ body {
 .home-container {
   width: 400px;
   height: 400px;
-  background-image: url('./assets/background.png');
+  background-image: url('C:\Users\bhebh\OneDrive\Documents\CODING\Projects\BlackCatPomodoro\blackcat-pomodoro\src\assets\background.png');
   background-size: cover;
   background-position: center;
   display: flex;

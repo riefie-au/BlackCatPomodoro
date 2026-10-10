@@ -1,16 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
 import './App.css';
+
+type Session = { type: "work" | "break", minutes: number };
+
+function buildSchedule(total: number, work: number, rest: number): Session[] {
+  const schedule: Session[] = [];
+  let remaining = total;
+
+  while (remaining > 0) {
+    const workLength = Math.min(work, remaining);
+    schedule.push({ type: "work", minutes: workLength });
+    remaining -= workLength;
+
+    if (remaining >= rest + work) {
+      schedule.push({ type: "break", minutes: rest });
+      remaining -= rest;
+    } else {
+      schedule[schedule.length - 1].minutes += remaining;
+      remaining = 0;
+    }
+  }
+  return schedule;
+}
+
+const STEP = 15;
+const MIN_TOTAL = 15;
+const MAX_TOTAL = 240;
 
 function App() {
   
-  const [timeLeft, setTimeLeft] = useState(1);
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
-  const [isBreak, setIsBreak] = useState(false);
   const [encouragement, setEncouragement] = useState("");
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
-  
+  const [totalMinutes, setTotalMinutes] = useState(60);
+  const [sessionIndex, setSessionIndex] = useState(0);
+  const schedule = buildSchedule(totalMinutes, workMinutes, breakMinutes);
+  const currentSession = schedule[sessionIndex];
+  const isBreak = currentSession.type === "break";
+
 
   const quoteMessages = [
   "Tomorrow will worry about itself - Matthew 6:34",
@@ -67,41 +96,20 @@ useEffect(() => {
     return `${m}:${s}`;
   }
 
-  const switchMode = (breakMode: boolean) => {
-    setIsBreak(breakMode);
-    setIsRunning(false);
-    setTimeLeft(breakMode ? 1 * 60 : 1 * 60);
-  }
 
-  const increaseTime = () => {
-    if (isBreak) {
-      const newMinutes = breakMinutes + 5;
-      setBreakMinutes(newMinutes);
-      setTimeLeft(newMinutes * 60);
-    }
-    else {
-      const newMinutes = workMinutes + 5;
-      setWorkMinutes(newMinutes);
-      setTimeLeft(newMinutes * 60);
-    }
-  }
-
-  const decreaseTime = () => {
-    if (breakMinutes < 5 || workMinutes < 5) {
-      return
-    }
-    if (isBreak) {
-      const newMinutes = breakMinutes - 5;
-      setBreakMinutes(newMinutes);
-      setTimeLeft(newMinutes * 60);
-    }
-    else {
-      const newMinutes = workMinutes - 5;
-      setWorkMinutes(newMinutes);
-      setTimeLeft(newMinutes * 60);
+  const changeTotal = (amount: number) => {
+    const newTotal = totalMinutes + amount;
+    if (newTotal < MIN_TOTAL || newTotal > MAX_TOTAL) {
+      return;
     }
 
+    setTotalMinutes(newTotal);
+    setSessionIndex(0);
+
+    const newSchedule = buildSchedule(newTotal, workMinutes, breakMinutes);
   }
+
+  
   const handleClick = () => {
     if (!isRunning) {
       setIsRunning(true);
@@ -121,26 +129,19 @@ useEffect(() => {
     
       <div className="home-content">
         <div className="home-controlls">
-          <button className="image-button" onClick={() => switchMode(false)}>
-            Work
-          </button>
-          <button className="image-button" onClick={() => switchMode(true)}>
-            Break
-          </button>
+          <button className="image-button" onClick={() => changeTotal(-STEP)} disabled={isRunning}>-</button>
+          <button className="image-button" onClick={() => changeTotal(STEP)} disabled={isRunning}>+</button>
         </div>
 
         <p className={`encouragemet-text ${!isRunning ? "hidden" : ""}`}>
           { encouragement }
         </p>
 
-        <div className="timer-row">
-          <button onClick={decreaseTime}>-</button>
-           <h1 className="home-timer">{formatTime(timeLeft)}</h1>
-          <button onClick={increaseTime}>+</button>
-        </div>
+        
+        <span className="total-text" >{totalMinutes} min</span>
+        <h1 className="home-timer">{formatTime(timeLeft)}</h1>
 
-  
-
+         
         <button className="home-button" onClick={handleClick}>
           Start
         </button>
