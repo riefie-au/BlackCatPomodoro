@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 
 type Session = { type: "work" | "break", minutes: number };
@@ -36,7 +36,7 @@ function App() {
   const [breakMinutes, setBreakMinutes] = useState(5);
   const [totalMinutes, setTotalMinutes] = useState(60);
   const [sessionIndex, setSessionIndex] = useState(0);
-  const schedule = buildSchedule(totalMinutes, workMinutes, breakMinutes);
+  const schedule = useMemo( () => buildSchedule(totalMinutes, workMinutes, breakMinutes), [totalMinutes, workMinutes, breakMinutes]);
   const currentSession = schedule[sessionIndex];
   const isBreak = currentSession.type === "break";
 
@@ -83,11 +83,28 @@ useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timer = setInterval( () => {
         setTimeLeft(prev => prev - 1);
-      }, 1000);
+      }, 10);
     }
     return() => clearInterval(timer);
   }, [isRunning, timeLeft]);
-    
+
+  useEffect(() => {
+    if (timeLeft !== 0 || !isRunning) {
+      return;
+    }
+  })
+
+  const nextIndex = sessionIndex + 1;
+
+  if(nextIndex >= schedule.length) {
+    setIsRunning(false);
+    setSessionIndex(0);
+    setTimeLeft(schedule[0].minutes * 60);
+  } else {
+    setSessionIndex(nextIndex);
+    setTimeLeft(schedule[nextIndex].minutes * 60);
+  }, [timeLeft, isRunning, schedule, sessionIndex]
+      
   const formatTime = (seconds: number): string => { //Fomats the time to 2 digit spaces for minute and 2 digit spaces for seconds
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
 
