@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 
+
+//Calculates the session schedule
 type Session = { type: "work" | "break", minutes: number };
 
 function buildSchedule(total: number, work: number, rest: number): Session[] {
@@ -39,6 +41,8 @@ function App() {
   const schedule = useMemo( () => buildSchedule(totalMinutes, workMinutes, breakMinutes), [totalMinutes, workMinutes, breakMinutes]);
   const currentSession = schedule[sessionIndex];
   const isBreak = currentSession.type === "break";
+  const breakCount = schedule.filter(s => s.type === "break").length;
+  const sessionNumber = sessionIndex + 1;
 
 
   const quoteMessages = [
@@ -83,7 +87,7 @@ useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timer = setInterval( () => {
         setTimeLeft(prev => prev - 1);
-      }, 10);
+      }, 1000);
     }
     return() => clearInterval(timer);
   }, [isRunning, timeLeft]);
@@ -92,7 +96,6 @@ useEffect(() => {
     if (timeLeft !== 0 || !isRunning) {
       return;
     }
-  })
 
   const nextIndex = sessionIndex + 1;
 
@@ -103,7 +106,9 @@ useEffect(() => {
   } else {
     setSessionIndex(nextIndex);
     setTimeLeft(schedule[nextIndex].minutes * 60);
-  }, [timeLeft, isRunning, schedule, sessionIndex]
+  }
+}, [timeLeft, isRunning, schedule, sessionIndex]);
+
       
   const formatTime = (seconds: number): string => { //Fomats the time to 2 digit spaces for minute and 2 digit spaces for seconds
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -112,6 +117,16 @@ useEffect(() => {
 
     return `${m}:${s}`;
   }
+
+  const breakText = (count: number): string => {
+    if (count === 0) {
+      return "No breaks";
+    } 
+    if (count === 1) {
+      return "1 break";
+    }
+    return `${count} breaks`;
+  };
 
 
   const changeTotal = (amount: number) => {
@@ -124,7 +139,10 @@ useEffect(() => {
     setSessionIndex(0);
 
     const newSchedule = buildSchedule(newTotal, workMinutes, breakMinutes);
-  }
+    setTimeLeft(newSchedule[0].minutes * 60);
+  };
+
+  
 
   
   const handleClick = () => {
@@ -132,9 +150,10 @@ useEffect(() => {
       setIsRunning(true);
     } else {
       setIsRunning(false);
-      setTimeLeft(isBreak ? 1 * 60 : 1 * 60);
+      setSessionIndex(0);
+      setTimeLeft(schedule[0].minutes * 60);
     }
-  }
+  };
 
   return (
     <div style={{position: 'relative'}}>
@@ -145,22 +164,29 @@ useEffect(() => {
       </div>
     
       <div className="home-content">
-        <div className="home-controlls">
-          <button className="image-button" onClick={() => changeTotal(-STEP)} disabled={isRunning}>-</button>
-          <button className="image-button" onClick={() => changeTotal(STEP)} disabled={isRunning}>+</button>
-        </div>
+        {isRunning ? (
+          <>
+            <p className="encouragement-text">{encouragement}</p>
 
-        <p className={`encouragemet-text ${!isRunning ? "hidden" : ""}`}>
-          { encouragement }
-        </p>
+            <h1 className="timer">{formatTime(timeLeft)}</h1>
 
-        
-        <span className="total-text" >{totalMinutes} min</span>
-        <h1 className="home-timer">{formatTime(timeLeft)}</h1>
+            <p className="session-text">
+              {isBreak ? "Break" : "Work"} · Session {sessionNumber} of {schedule.length} · {totalMinutes} min total
+            </p>
+          </>
+        ) : (
+          <>
+            <div className = "home-controlls">
+              <button className="image-button" onClick={() => changeTotal(-STEP)}>-</button>
+              <h1 className="total-text">{totalMinutes} min</h1>
+              <button className="image-button" onClick={() => changeTotal(STEP)}>+</button>
+            </div>  
 
-         
+            <p className="session-text">{breakText(breakCount)}</p>
+          </>
+        )}
         <button className="home-button" onClick={handleClick}>
-          Start
+          {isRunning ? "Stop" : "Start"}
         </button>
       </div>
     </div>
