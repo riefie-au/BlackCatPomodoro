@@ -25,9 +25,21 @@ function buildSchedule(total: number, work: number, rest: number): Session[] {
   return schedule;
 }
 
+//Time limits
+//General Home page
 const STEP = 15;
 const MIN_TOTAL = 15;
 const MAX_TOTAL = 240;
+
+//Settings page
+const MIN_WORK = 10;
+const MAX_WORK = 60;
+const WORK_STEP = 5;
+const MIN_BREAK = 5;
+const MAX_BREAK = 30;
+const BREAK_STEP = 5;
+
+
 
 function App() {
   
@@ -38,6 +50,7 @@ function App() {
   const [breakMinutes, setBreakMinutes] = useState(5);
   const [totalMinutes, setTotalMinutes] = useState(60);
   const [sessionIndex, setSessionIndex] = useState(0);
+  const [page, setPage] = useState <"home" | "settings">("home");
   const schedule = useMemo( () => buildSchedule(totalMinutes, workMinutes, breakMinutes), [totalMinutes, workMinutes, breakMinutes]);
   const currentSession = schedule[sessionIndex];
   const isBreak = currentSession.type === "break";
@@ -81,7 +94,7 @@ useEffect(() => {
     messageInterval = setInterval(() => {
       setEncouragement(messages[index]);
       index = (index + 1) % messages.length;
-    }, 4000)
+    }, 10000)
   } else {
     setEncouragement("");
   }
@@ -94,7 +107,7 @@ useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timer = setInterval( () => {
         setTimeLeft(prev => prev - 1);
-      }, 1000);
+      }, 10);
     }
     return() => clearInterval(timer);
   }, [isRunning, timeLeft]);
@@ -135,7 +148,7 @@ useEffect(() => {
     return `${count} breaks`;
   };
 
-
+//Functions to change the time value
   const changeTotal = (amount: number) => {
     const newTotal = totalMinutes + amount;
     if (newTotal < MIN_TOTAL || newTotal > MAX_TOTAL) {
@@ -149,9 +162,28 @@ useEffect(() => {
     setTimeLeft(newSchedule[0].minutes * 60);
   };
 
-  
+  const changeWork = (amount: number) => {
+    const newWork = workMinutes + amount;
+    if (newWork < MIN_WORK || newWork > MAX_WORK) {
+      return;
+    }
+    setWorkMinutes(newWork);
+  }
 
-  
+  const changeBreak = (amount: number) => {
+    const newBreak = breakMinutes + amount;
+    if (newBreak < MIN_BREAK || newBreak > MAX_BREAK) {
+      return;
+    }
+    setBreakMinutes(newBreak);
+  }
+
+  const closeSettings = () => {
+    setPage("home");
+    setSessionIndex(0);
+    setTimeLeft(schedule[0].minutes * 60);
+  }
+
   const handleClick = () => {
     if (!isRunning) {
       setIsRunning(true);
@@ -162,6 +194,35 @@ useEffect(() => {
     }
   };
 
+
+if (page === "settings") {
+  return (
+    <div className="settings-content">
+      <h1 className="settings-title">Settings</h1>
+      <div className="settings-row">
+        <p className="settings-label">Focus Length</p>
+        <div className="home-controlls">
+          <button className="image-button" onClick={() => changeWork(-WORK_STEP)}>-</button>
+          <h1 className="total-text">{workMinutes} min</h1>
+          <button className="image-button" onClick={() => changeWork(WORK_STEP)}>+</button>
+        </div>
+      </div>
+
+      <div className="settings-row">
+        <p className="settings-label">Break Length</p>
+        <div className="home-controlls">
+          <button className="image-button" onClick={() => changeBreak(-BREAK_STEP)}>-</button>
+          <h1 className="total-text">{breakMinutes} min</h1>
+          <button className="image-button" onClick={() => changeBreak(BREAK_STEP)}>+</button>
+        </div>
+      </div>
+
+      <button className="home-button" onClick={closeSettings}>
+        Back
+      </button>
+    </div>
+  );
+}
   return (
     <div style={{position: 'relative'}}>
       <div>
@@ -178,7 +239,7 @@ useEffect(() => {
             <h1 className="timer">{formatTime(timeLeft)}</h1>
 
             <p className="session-text">
-              {isBreak ? "Break" : "Focus"} · {typeNumber} · {totalMinutes} min total
+              {isBreak ? "Break" : "Focus"} · {typeNumber} out of {typeTotal} · {totalMinutes} min total
             </p>
           </>
         ) : (
@@ -190,11 +251,13 @@ useEffect(() => {
             </div>  
 
             <p className="session-text">{breakText(breakCount)}</p>
+            
           </>
         )}
         <button className="home-button" onClick={handleClick}>
           {isRunning ? "Stop" : "Start"}
         </button>
+        <button className="settings-button" onClick={() => setPage("settings")}>Settings</button>
       </div>
     </div>
     
