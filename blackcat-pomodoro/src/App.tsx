@@ -42,7 +42,14 @@ function App() {
   const currentSession = schedule[sessionIndex];
   const isBreak = currentSession.type === "break";
   const breakCount = schedule.filter(s => s.type === "break").length;
+  const focusCount = schedule.filter(s => s.type === "work").length;
+  const typeTotal = isBreak ? breakCount : focusCount;
   const sessionNumber = sessionIndex + 1;
+
+  const typeNumber = schedule
+    .slice(0, sessionIndex + 1)
+    .filter(s => s.type === currentSession.type)
+    .length;
 
 
   const quoteMessages = [
@@ -171,7 +178,7 @@ useEffect(() => {
             <h1 className="timer">{formatTime(timeLeft)}</h1>
 
             <p className="session-text">
-              {isBreak ? "Break" : "Work"} · Session {sessionNumber} of {schedule.length} · {totalMinutes} min total
+              {isBreak ? "Break" : "Focus"} · {typeNumber} · {totalMinutes} min total
             </p>
           </>
         ) : (
