@@ -59,6 +59,7 @@ function App() {
   const focusCount = schedule.filter(s => s.type === "work").length;
   const typeTotal = isBreak ? breakCount : focusCount;
   const sessionNumber = sessionIndex + 1;
+  const [editing, setEditing] = useState<"work" | "break">("work");
 
   const typeNumber = schedule
     .slice(0, sessionIndex + 1)
@@ -108,7 +109,7 @@ useEffect(() => {
     if (isRunning && timeLeft > 0) {
       timer = setInterval( () => {
         setTimeLeft(prev => prev - 1);
-      }, 10);
+      }, 1000);
     }
     return() => clearInterval(timer);
   }, [isRunning, timeLeft]);
@@ -195,74 +196,85 @@ useEffect(() => {
     }
   };
 
+  const handleBack = () => {
+    if (page === "settings") {
+      if (editing === "work") {
+        changeWork(-WORK_STEP);
+      } else {
+        changeBreak(-BREAK_STEP);
+      }
+    } else {
+      changeTotal(-STEP);
+    }
+  };
 
-if (page === "settings") {
+  const handleForward = () => {
+    if (page === "settings") {
+      if (editing === "work") {
+        changeWork(WORK_STEP);
+      } else {
+        changeBreak(BREAK_STEP);
+      }
+    } else {
+      changeTotal(STEP);
+    }
+  }
+
+  const handleSettings = () => {
+    if (page === "settings") {
+      closeSettings();
+    } else {
+      setPage("settings");
+    }
+  }
+
+
   return (
-    <div className="settings-content">
-      <h1 className="settings-title">Settings</h1>
-      <div className="settings-row">
-        <p className="settings-label">Focus Length</p>
-        <div className="home-controlls">
-          <button className="image-button" onClick={() => changeWork(-WORK_STEP)}>-</button>
-          <h1 className="total-text">{workMinutes} min</h1>
-          <button className="image-button" onClick={() => changeWork(WORK_STEP)}>+</button>
+    <div className="app">
+      <div className="frame">
+        <div className="screen">
+          {page === "settings" ? (
+            <>
+              <p className="settings-header">&gt;&gt; Settings</p>
+              <p className="screen-label">{editing === "work" ? "Focus" : "Break"}</p>
+              <h1 className="screen-timer">
+                {formatTime((editing === "work" ? workMinutes : breakMinutes) * 60)}
+              </h1>
+              <button className="screen-link" onClick={closeSettings}>&gt;&gt; back</button>
+            </>
+          ) : (
+            <>
+              <p className="screen-label">{isRunning ? encouragement : ""}</p>
+              <h1 className="screen-timer">
+                {formatTime(isRunning ? timeLeft : totalMinutes * 60)}
+              </h1>
+              <p className="screen-label">
+                {isBreak ? "Break" : "Focus"} {typeNumber} of {typeTotal}
+              </p>
+            </>
+          )}
+        </div>
+        {/* Button Bar */}
+        <div className="button-bar">
+          <button className="pixel-btn btn-back" onClick={handleBack} disabled={isRunning} aria-label="Decrease" />
+          <button className="pixel-btn btn-forward" onClick={handleForward} disabled={isRunning} aria-label="Increase" />
+          <button className="pixel-btn btn-play" onClick={handleClick} disabled={page === "settings"} aria-label="Start or stop" />
+          <button
+            className={`pixel-btn btn-work ${editing === "work" ? "selected" : ""}`}
+            onClick={() => setEditing("work")}
+            disabled={page !== "settings"}
+            aria-label="Edit focus time"
+          />
+          <button
+            className={`pixel-btn btn-break ${editing === "break" ? "selected" : ""}`}
+            onClick={() => setEditing("break")}
+            disabled={page !== "settings"}
+            aria-label="Edit break time"
+          />
+          <button className="pixel-btn btn-settings" onClick={handleSettings} disabled={isRunning} aria-label="Settings" />
         </div>
       </div>
-
-      <div className="settings-row">
-        <p className="settings-label">Break Length</p>
-        <div className="home-controlls">
-          <button className="image-button" onClick={() => changeBreak(-BREAK_STEP)}>-</button>
-          <h1 className="total-text">{breakMinutes} min</h1>
-          <button className="image-button" onClick={() => changeBreak(BREAK_STEP)}>+</button>
-        </div>
-      </div>
-
-      <button className="home-button" onClick={closeSettings}>
-        Back
-      </button>
     </div>
-  );
-}
-  return (
-    <div style={{position: 'relative'}}>
-      <div>
-        <button className="closeButton">
-          Close
-        </button>
-      </div>
-    
-      <div className="home-content">
-        {isRunning ? (
-          <>
-            <p className="encouragement-text">{encouragement}</p>
-
-            <h1 className="timer">{formatTime(timeLeft)}</h1>
-
-            <p className="session-text">
-              {isBreak ? "Break" : "Focus"} · {typeNumber} out of {typeTotal} · {totalMinutes} min total
-            </p>
-          </>
-        ) : (
-          <>
-            <div className = "home-controlls">
-              <button className="image-button" onClick={() => changeTotal(-STEP)}>-</button>
-              <h1 className="total-text">{totalMinutes} min</h1>
-              <button className="image-button" onClick={() => changeTotal(STEP)}>+</button>
-            </div>  
-
-            <p className="session-text">{breakText(breakCount)}</p>
-            
-          </>
-        )}
-        <button className="home-button" onClick={handleClick}>
-          {isRunning ? "Stop" : "Start"}
-        </button>
-        <button className="settings-button" onClick={() => setPage("settings")}>Settings</button>
-      </div>
-    </div>
-    
-    
   );
 }
 

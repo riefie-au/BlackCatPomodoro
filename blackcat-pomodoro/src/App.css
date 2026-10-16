@@ -1,102 +1,125 @@
-/*@font-face {
-  font-family: 'Retrograde-Regular';
-  src: url('./assets/Retrograde-Regular.otf') format('opentype');
+@font-face {
+  font-family: 'Minecraft';
+  src: url('./assets/Minecraft.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
-*/
 body {
-  font-family: 'Retrograde-Regular', sans-serif;
+  font-family: 'Minecraft';
   margin: 0;
   padding: 0;
 }
 
-.home-container {
-  width: 400px;
-  height: 400px;
-  background-image: url('C:\Users\bhebh\OneDrive\Documents\CODING\Projects\BlackCatPomodoro\blackcat-pomodoro\src\assets\background.png');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  box-sizing: border-box;
-  text-align: center;
+body {
+  background: #1e1e1e;
 }
 
-.home-content {
+.app {
+  display: flex;
+  justify-content: center;
+}
+
+.frame {
+  position: relative;            /* children are positioned from HERE */
+  width: 400px;
+  height: 400px;
+  background: url('./assets/background.png') center / contain no-repeat;
+}
+
+.screen {
+  position: absolute;
+  left: 100px;                   /* ⚠️ estimates: tune these in Step 6 */
+  top: 84px;
+  width: 232px;
+  height: 184px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  width: 100%;
-  padding-top: 60px;
-  padding-bottom: 20px;
-  box-sizing: border-box;
-}
-
-.encouragement-text {
-  font-size: 1.25rem;
-  color: #b1cad8;
-  margin-bottom: 0.5rem;
-  animation: fadeIn 1s ease-in-out;
-  transition: opacity 0.8s ease;
-
-}
-
-.encouragement-text.hidden {
-  opacity: 0;
-}
-
-
-.home-controls {
-  display: flex;
   justify-content: center;
+  gap: 4px;
+  color: white;
+  text-align: center;
+}
+
+.screen-timer {
+  font-size: 56px;
   margin: 0;
 }
 
-.image-button {
-  background: none;
-  border: none;
-  cursor: pointer;
+.screen-label {
+  font-size: 12px;
+  margin: 0;
+  min-height: 14px;              /* keeps space even when empty */
 }
 
-.image-button img {
-  width: 100px;
-}
-
-.home-timer {
-  font-size: 60px;
-  color: #d09caf;
+.screen-heading,
+.screen-link {
+  align-self: flex-start;        /* the ">> Settings" text sits on the left */
+  font-size: 12px;
   margin: 0;
 }
 
-.gif-image {
-  height:100px;
-}
-
-.home-button {
+.screen-link {
   background: none;
   border: none;
+  color: white;
+  font-family: inherit;
+  padding: 0;
   cursor: pointer;
 }
 
-.home-button img {
-  width: 60px;
+.button-bar {
+    position: absolute;
+    left: 141px;
+    top: 277px;
+    width: 124px;
+    height: 22px;
+    display: flex;
+    justify-content: space-between;
 }
 
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
+.pixel-btn {
+    width: 30px;
+    height: 22px;
+    margin: 0px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 183%;
+    image-rendering: pixelated;
 }
 
-.close-button img {
-  width: 24px;
-  height: 24px;
+.pixel-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
+
+/* normal → clicked */
+.btn-back             { background-image: url('./assets/backBtn.png'); }
+.btn-back:active      { background-image: url('./assets/backClkBtn.png'); }
+
+.btn-forward          { background-image: url('./assets/forwardBtn.png'); }
+.btn-forward:active   { background-image: url('./assets/forwardClkBtn.png'); }
+
+.btn-play             { background-image: url('./assets/playBtn.png'); }
+.btn-play:active      { background-image: url('./assets/playClkBtn.png'); }
+
+.btn-settings { 
+  background-image: url('./assets/iterateBtn.png');
+  margin-left: 10px;
+ }
+.btn-settings:active  { background-image: url('./assets/iterateClkBtn.png'); }
+
+/* work & break also stay pressed while selected */
+.btn-work             { background-image: url('./assets/workBtn.png'); }
+.btn-work:active,
+.btn-work.selected    { background-image: url('./assets/workClkBtn.png'); }
+
+.btn-break            { background-image: url('./assets/breakBtn.png'); }
+.btn-break:active,
+.btn-break.selected   { background-image: url('./assets/breakClkBtn.png'); }
+
