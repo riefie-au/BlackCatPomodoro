@@ -4,6 +4,7 @@ import './App.css';
 
 //Calculates the session schedule
 type Session = { type: "work" | "break", minutes: number };
+const MIN_LAST_FOCUS =10; // shortest final focus can be
 
 function buildSchedule(total: number, work: number, rest: number): Session[] {
   const schedule: Session[] = [];
@@ -14,7 +15,7 @@ function buildSchedule(total: number, work: number, rest: number): Session[] {
     schedule.push({ type: "work", minutes: workLength });
     remaining -= workLength;
 
-    if (remaining >= rest + work) {
+    if (remaining >= rest + MIN_LAST_FOCUS) {
       schedule.push({ type: "break", minutes: rest });
       remaining -= rest;
     } else {
